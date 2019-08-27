@@ -39,12 +39,16 @@
 									<listOptionValue builtIn="false" value="../Lora/Mac"/>
 									<listOptionValue builtIn="false" value="../Lora/Phy"/>
 									<listOptionValue builtIn="false" value="../Lora/Utilities"/>
+									<listOptionValue builtIn="false" value="../Lora/Radio"/>
 								</option>
 								<inputType id="com.atollic.truestudio.as.input.466749170" name="Input" superClass="com.atollic.truestudio.as.input"/>
 							</tool>
 							<tool id="com.atollic.truestudio.exe.debug.toolchain.gcc.1187693238" name="C Compiler" superClass="com.atollic.truestudio.exe.debug.toolchain.gcc">
 								<option id="com.atollic.truestudio.gcc.symbols.defined.1484157096" name="Defined symbols" superClass="com.atollic.truestudio.gcc.symbols.defined" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="STM32F411xE"/>
+									<listOptionValue builtIn="false" value="REGION_EU868"/>
+									<listOptionValue builtIn="false" value="USE_BAND_868"/>
+									<listOptionValue builtIn="false" value="USE_MODEM_LORA"/>
 								</option>
 								<option id="com.atollic.truestudio.gcc.directories.select.2035934776" name="Include path" superClass="com.atollic.truestudio.gcc.directories.select" valueType="includePath">
 									<listOptionValue builtIn="false" value="../src"/>
@@ -56,6 +60,8 @@
 									<listOptionValue builtIn="false" value="../Lora/Mac"/>
 									<listOptionValue builtIn="false" value="../Lora/Phy"/>
 									<listOptionValue builtIn="false" value="../Lora/Utilities"/>
+									<listOptionValue builtIn="false" value="../Lora/Radio"/>
+									<listOptionValue builtIn="false" value="../Lora/Radio/sx1272"/>
 								</option>
 								<option id="com.atollic.truestudio.common_options.target.endianess.160387458" name="Endianess" superClass="com.atollic.truestudio.common_options.target.endianess"/>
 								<option id="com.atollic.truestudio.common_options.target.mcpu.65311742" name="Microcontroller" superClass="com.atollic.truestudio.common_options.target.mcpu" value="STM32F411VC" valueType="enumerated"/>

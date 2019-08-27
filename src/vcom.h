@@ -1,9 +1,23 @@
+/*
+ / _____)             _              | |
+( (____  _____ ____ _| |_ _____  ____| |__
+ \____ \| ___ |    (_   _) ___ |/ ___)  _ \
+ _____) ) ____| | | || |_| ____( (___| | | |
+(______/|_____)_|_|_| \__)_____)\____)_| |_|
+    (C)2013 Semtech
+
+Description: virtual com port driver
+
+License: Revised BSD License, see LICENSE.TXT file include in the project
+
+Maintainer: Miguel Luis and Gregory Cristian
+*/
  /******************************************************************************
-  * @file    low_power.h
+  * @file    vcom.h
   * @author  MCD Application Team
   * @version V1.1.0
   * @date    27-February-2017
-  * @brief   Header for driver low_power.c module
+  * @brief   Header for vcom.c module
   ******************************************************************************
   * @attention
   *
@@ -43,56 +57,86 @@
   *
   ******************************************************************************
   */
-
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __LOW_POWER_H__
-#define __LOW_POWER_H__
+#ifndef __VCOM_H__
+#define __VCOM_H__
 
 #ifdef __cplusplus
  extern "C" {
 #endif
-
+   
 /* Includes ------------------------------------------------------------------*/
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* External variables --------------------------------------------------------*/
-/* Exported macros -----------------------------------------------------------*/
+
 /* Exported functions ------------------------------------------------------- */ 
 
-/*!
- * @brief API to set flag allowing power mode
- *
- * @param [IN] enum e_LOW_POWER_State_Id_t
- */
-//void LowPower_Disable( e_LOW_POWER_State_Id_t state );
+/** 
+* @brief  Init the VCOM.
+* @param  None
+* @return None
+*/
+void vcom_Init(void);
 
-/*!
- * @brief API to reset flag allowing power mode
- *
- * @param [IN] enum e_LOW_POWER_State_Id_t 
- */
+   /** 
+* @brief  DeInit the VCOM.
+* @param  None
+* @return None
+*/
+void vcom_DeInit(void);
 
-//void LowPower_Enable( e_LOW_POWER_State_Id_t state );
+   /** 
+* @brief  Init the VCOM IOs.
+* @param  None
+* @return None
+*/
+void vcom_IoInit(void);
+  
+   /** 
+* @brief  DeInit the VCOM IOs.
+* @param  None
+* @return None
+*/
+void vcom_IoDeInit(void);
+  
+/** 
+* @brief  Records string on circular Buffer and set SW interrupt
+* @note   Set NVIC to call vcom_Send
+* @param  string
+* @return None
+*/
+void vcom_Send( char *format, ... );
 
-/*!
- * @brief API to get flag allowing power mode
- * @note When flag is 0, low power mode is allowed
- * @param [IN] non
- * @retval flag state 
- */
-uint32_t LowPower_GetState( void );
+/** 
+* @brief  Sends circular Buffer on com port in IT mode
+* @note   called from low Priority interrupt
+* @param  None
+* @return None
+*/
+void vcom_Print( void);
 
-/*!
- * @brief Manages the entry into ARM cortex deep-sleep mode
- * @param none
- * @retval none
- */
-void LowPower_Handler( void );
+/** 
+* @brief  Records string on circular Buffer
+* @note   To be called only from critical section from low power section
+*         Other wise use vcom_Send
+* @param  string
+* @return None
+*/
+void vcom_Send_Lp( char *format, ... );
+
+/* Exported macros -----------------------------------------------------------*/
+#if 1
+#define PRINTF(...)            vcom_Send(__VA_ARGS__)
+#else
+#define PRINTF(...)
+#endif
+
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __LOW_POWER_H__ */
+#endif /* __VCOM_H__*/
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

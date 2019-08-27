@@ -60,7 +60,7 @@ Maintainer: Miguel Luis and Gregory Cristian
 #ifndef __UTILITIES_H__
 #define __UTILITIES_H__
 
-#include "hw_conf.h"
+#include "stm32f4xx_hal_conf.h"
 
 
 /* BACKUP_PRIMASK MUST be implemented at the begining of the funtion 
