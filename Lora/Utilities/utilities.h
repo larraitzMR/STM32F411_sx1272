@@ -60,7 +60,10 @@ Maintainer: Miguel Luis and Gregory Cristian
 #ifndef __UTILITIES_H__
 #define __UTILITIES_H__
 
-#include "stm32f4xx_hal_conf.h"
+//#include "hw_conf.h"
+#include <stdbool.h>
+#include <string.h>
+#include <stdint.h>
 
 
 /* BACKUP_PRIMASK MUST be implemented at the begining of the funtion 
@@ -104,18 +107,18 @@ typedef uint32_t TimerTime_t;
  */
 #define POW2( n ) ( 1 << n )
 
-/*!
- * \brief  Find First Set
- *         This function identifies the least significant index or position of the
- *         bits set to one in the word
- *
- * \param [in]  value  Value to find least significant index
- * \retval bitIndex    Index of least significat bit at one
- */
-__STATIC_INLINE uint8_t __ffs( uint32_t value )
-{
-    return( uint32_t )( 32 - __CLZ( value & ( -value ) ) );
-}
+///*!
+// * \brief  Find First Set
+// *         This function identifies the least significant index or position of the
+// *         bits set to one in the word
+// *
+// * \param [in]  value  Value to find least significant index
+// * \retval bitIndex    Index of least significat bit at one
+// */
+//__STATIC_INLINE uint8_t __ffs( uint32_t value )
+//{
+//    return( uint32_t )( 32 - __CLZ( value & ( -value ) ) );
+//}
 
 /*!
  * \brief Initializes the pseudo ramdom generator initial value

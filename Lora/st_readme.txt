@@ -1,9 +1,14 @@
- /******************************************************************************
-  * @file    low_power.h
+  @verbatim
+  ******************************************************************************
+  *  
+  *           Portions COPYRIGHT 2017 STMicroelectronics                       
+  *
+  * @file    st_readme.txt 
   * @author  MCD Application Team
-  * @version V1.1.0
-  * @date    27-February-2017
-  * @brief   Header for driver low_power.c module
+  * @brief   This file lists the main modification done by STMicroelectronics on
+  *          LoRa for integration with STM32Cube solution.
+  *          For more details on LoRa implementation on STM32Cube, please refer
+  *          to UM2073 "STM32 LORA01 software expansion for STM32Cube "  
   ******************************************************************************
   * @attention
   *
@@ -42,57 +47,40 @@
   * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   *
   ******************************************************************************
-  */
+  @endverbatim
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __LOW_POWER_H__
-#define __LOW_POWER_H__
+### V1.1.0/27-February-2017 ###
+===============================
+   +  Implements LoRa Mac 4.4.0 from Semteck/StackForce  from the develop branch
+### V1.0.3/01-January-2017 ###
+===============================
+   +  Read date between 2 successive read time to make sure date is ok
 
-#ifdef __cplusplus
- extern "C" {
-#endif
+### V1.0.2/15-November-2016 ###
+===============================
+   +  Corrected 1 bug in LoRaMac-board.h: RX_WND_2_CHANNEL for EU is now back at DR_0
+   +  Corrected 1 bug in LoRaMac.c for  dataRate adaptation
 
-/* Includes ------------------------------------------------------------------*/
-/* Exported types ------------------------------------------------------------*/
-/* Exported constants --------------------------------------------------------*/
-/* External variables --------------------------------------------------------*/
-/* Exported macros -----------------------------------------------------------*/
-/* Exported functions ------------------------------------------------------- */ 
+### V1.0.1/15-September-2016 ###
+===============================
+   +  Implements LoRa Mac 4.3.0 from Semteck/StackForce 
 
-/*!
- * @brief API to set flag allowing power mode
- *
- * @param [IN] enum e_LOW_POWER_State_Id_t
+### V1.0.0/01-July-2016 ###
+===============================
+   + First R1.0.0 customized version for STM32Cube solution.
+   + Comissioning_template.h in /Conf contains all Lora Ids to connect on LoRa network
+         It is provided as a template. It must be moved to /Projects/inc/ as Comissioning.h
+   + All files in Conf/src are provided as template and must be copied in /Projects/src. 
+   + All files in Conf/inc are provided as template and must be copied in /Projects/inc.
+		#if 0 and #endif must be removed to enable the template in the user directory
+   + Implements LoRa Mac 4.2.0 from Semteck/StackForce
+      + \Lora\Mac\LoRaMac.c : replace floating exponent e3 and e6 by int number
+      + \Lora\Utilities\delay.c : cast uint32_t
+   + Modified intensively timeServer.c 
+   + new low layer interfacing Cube HAL (hw_rtc.c, hw_gpio.c and hw_spi.c)
+   + added lora.c as an interface layer to ease product integration
+
+
+ * <h3><center>&copy; COPYRIGHT STMicroelectronics</center></h3>
  */
-//void LowPower_Disable( e_LOW_POWER_State_Id_t state );
-
-/*!
- * @brief API to reset flag allowing power mode
- *
- * @param [IN] enum e_LOW_POWER_State_Id_t 
- */
-
-//void LowPower_Enable( e_LOW_POWER_State_Id_t state );
-
-/*!
- * @brief API to get flag allowing power mode
- * @note When flag is 0, low power mode is allowed
- * @param [IN] non
- * @retval flag state 
- */
-uint32_t LowPower_GetState( void );
-
-/*!
- * @brief Manages the entry into ARM cortex deep-sleep mode
- * @param none
- * @retval none
- */
-void LowPower_Handler( void );
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* __LOW_POWER_H__ */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+ 

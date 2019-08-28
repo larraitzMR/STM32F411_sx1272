@@ -21,23 +21,23 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   ALLOC
   8 .ARM.attributes 00000030  00000000  00000000  0002000c  2**0
                   CONTENTS, READONLY
-  9 .debug_info   0000db38  00000000  00000000  0002003c  2**0
+  9 .debug_info   0000da8d  00000000  00000000  0002003c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_abbrev 00001db5  00000000  00000000  0002db74  2**0
+ 10 .debug_abbrev 00001d9d  00000000  00000000  0002dac9  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_aranges 000007e8  00000000  00000000  0002f930  2**3
+ 11 .debug_aranges 000007e8  00000000  00000000  0002f868  2**3
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000720  00000000  00000000  00030118  2**3
+ 12 .debug_ranges 00000720  00000000  00000000  00030050  2**3
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_line   000040cb  00000000  00000000  00030838  2**0
+ 13 .debug_line   000040cb  00000000  00000000  00030770  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_str    000027bc  00000000  00000000  00034903  2**0
+ 14 .debug_str    000027b5  00000000  00000000  0003483b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .comment      0000007c  00000000  00000000  000370bf  2**0
+ 15 .comment      0000007c  00000000  00000000  00036ff0  2**0
                   CONTENTS, READONLY
- 16 .debug_frame  00001f50  00000000  00000000  0003713c  2**2
+ 16 .debug_frame  00001f50  00000000  00000000  0003706c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 17 .stabstr      0000003f  00000000  00000000  0003908c  2**0
+ 17 .stabstr      0000003f  00000000  00000000  00038fbc  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -4062,9 +4062,6 @@ void HAL_MspInit(void)
 {
  80019a0:	b580      	push	{r7, lr}
  80019a2:	af00      	add	r7, sp, #0
-  /* USER CODE BEGIN MspInit 0 */
-
-  /* USER CODE END MspInit 0 */
 
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
  80019a4:	2003      	movs	r0, #3
@@ -4078,9 +4075,6 @@ void HAL_MspInit(void)
  80019ae:	f04f 30ff 	mov.w	r0, #4294967295
  80019b2:	f7fe fd16 	bl	80003e2 <HAL_NVIC_SetPriority>
 
-  /* USER CODE BEGIN MspInit 1 */
-
-  /* USER CODE END MspInit 1 */
 }
  80019b6:	bf00      	nop
  80019b8:	bd80      	pop	{r7, pc}

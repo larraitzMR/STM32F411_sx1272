@@ -37,7 +37,6 @@
 									<listOptionValue builtIn="false" value="../Lora/Core"/>
 									<listOptionValue builtIn="false" value="../Lora/Crypto"/>
 									<listOptionValue builtIn="false" value="../Lora/Mac"/>
-									<listOptionValue builtIn="false" value="../Lora/Phy"/>
 									<listOptionValue builtIn="false" value="../Lora/Utilities"/>
 									<listOptionValue builtIn="false" value="../Lora/Radio"/>
 								</option>
@@ -58,7 +57,6 @@
 									<listOptionValue builtIn="false" value="../Lora/Core"/>
 									<listOptionValue builtIn="false" value="../Lora/Crypto"/>
 									<listOptionValue builtIn="false" value="../Lora/Mac"/>
-									<listOptionValue builtIn="false" value="../Lora/Phy"/>
 									<listOptionValue builtIn="false" value="../Lora/Utilities"/>
 									<listOptionValue builtIn="false" value="../Lora/Radio"/>
 									<listOptionValue builtIn="false" value="../Lora/Radio/sx1272"/>

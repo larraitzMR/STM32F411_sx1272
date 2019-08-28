@@ -46,6 +46,10 @@
 #ifndef __LORAMAC_H__
 #define __LORAMAC_H__
 
+#include <stdbool.h>
+#include <string.h>
+#include <stdint.h>
+
 /*!
  * Beacon interval in ms
  */

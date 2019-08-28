@@ -59,7 +59,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "hw.h"
+//#include "hw.h"
 #include "timeServer.h"
 #include "LoRaMac.h"
 #include "lora.h"

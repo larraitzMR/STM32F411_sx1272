@@ -59,7 +59,7 @@ Maintainer: Miguel Luis and Gregory Cristian
   */
 
 /* Includes ------------------------------------------------------------------*/
-#include "hw.h"
+//#include "hw.h"
 #include "timeServer.h"
 
 void DelayMs( uint32_t ms )

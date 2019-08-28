@@ -1781,7 +1781,7 @@ LOAD c:/program files (x86)/atollic/truestudio for arm 8.1.0/armtools/bin/../lib
                 0x00000357       0x22 c:/program files (x86)/atollic/truestudio for arm 8.1.0/armtools/bin/../lib/gcc/arm-atollic-eabi/6.3.1/armv7e-m/fpu/crtn.o
 OUTPUT(stm32f4_lora.elf elf32-littlearm)
 
-.debug_info     0x00000000     0xdb38
+.debug_info     0x00000000     0xda8d
  .debug_info    0x00000000      0xffc Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
  .debug_info    0x00000ffc     0x150d Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.o
  .debug_info    0x00002509      0xf31 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.o
@@ -1794,9 +1794,9 @@ OUTPUT(stm32f4_lora.elf elf32-littlearm)
  .debug_info    0x0000ae80       0x7f src\startup_stm32f411xe.o
  .debug_info    0x0000aeff      0x4f0 src\system_stm32f4xx.o
  .debug_info    0x0000b3ef     0x10ae src\uart.o
- .debug_info    0x0000c49d     0x169b src\vcom.o
+ .debug_info    0x0000c49d     0x15f0 src\vcom.o
 
-.debug_abbrev   0x00000000     0x1db5
+.debug_abbrev   0x00000000     0x1d9d
  .debug_abbrev  0x00000000      0x2d5 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
  .debug_abbrev  0x000002d5      0x371 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.o
  .debug_abbrev  0x00000646      0x24c Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.o
@@ -1809,7 +1809,7 @@ OUTPUT(stm32f4_lora.elf elf32-littlearm)
  .debug_abbrev  0x0000174e       0x12 src\startup_stm32f411xe.o
  .debug_abbrev  0x00001760      0x11f src\system_stm32f4xx.o
  .debug_abbrev  0x0000187f      0x221 src\uart.o
- .debug_abbrev  0x00001aa0      0x315 src\vcom.o
+ .debug_abbrev  0x00001aa0      0x2fd src\vcom.o
 
 .debug_aranges  0x00000000      0x7e8
  .debug_aranges
@@ -1869,7 +1869,7 @@ OUTPUT(stm32f4_lora.elf elf32-littlearm)
  .debug_line    0x00003905      0x350 src\uart.o
  .debug_line    0x00003c55      0x476 src\vcom.o
 
-.debug_str      0x00000000     0x27bc
+.debug_str      0x00000000     0x27b5
  .debug_str     0x00000000      0xcb9 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
                                 0xd58 (size before relaxing)
  .debug_str     0x00000cb9      0x419 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.o
@@ -1892,8 +1892,8 @@ OUTPUT(stm32f4_lora.elf elf32-littlearm)
                                 0x3a9 (size before relaxing)
  .debug_str     0x00002683       0x26 src\uart.o
                                 0xc24 (size before relaxing)
- .debug_str     0x000026a9      0x113 src\vcom.o
-                               0x10ef (size before relaxing)
+ .debug_str     0x000026a9      0x10c src\vcom.o
+                               0x10e8 (size before relaxing)
 
 .comment        0x00000000       0x7c
  .comment       0x00000000       0x7c Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o

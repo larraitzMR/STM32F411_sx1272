@@ -28,7 +28,7 @@ Maintainer: Miguel Luis ( Semtech ), Gregory Cristian ( Semtech ) and Daniel Jäc
 #include "region/Region.h"
 #include "LoRaMacCrypto.h"
 
-#include "debug.h"
+//#include "debug.h"
 #include "LoRaMacTest.h"
 
 /*!

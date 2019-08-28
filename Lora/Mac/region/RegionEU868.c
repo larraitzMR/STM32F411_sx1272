@@ -30,7 +30,7 @@ Maintainer: Miguel Luis ( Semtech ), Gregory Cristian ( Semtech ) and Daniel Jae
 #include "Region.h"
 #include "RegionCommon.h"
 #include "RegionEU868.h"
-#include "debug.h"
+//#include "debug.h"
 
 
 // Definitions

@@ -1,30 +1,19 @@
-/*!
- * \file      radio.h
- *
- * \brief     Radio driver API definition
- *
- * \copyright Revised BSD License, see section \ref LICENSE.
- *
- * \code
- *                ______                              _
- *               / _____)             _              | |
- *              ( (____  _____ ____ _| |_ _____  ____| |__
- *               \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- *               _____) ) ____| | | || |_| ____( (___| | | |
- *              (______/|_____)_|_|_| \__)_____)\____)_| |_|
- *              (C)2013-2017 Semtech
- *
- * \endcode
- *
- * \author    Miguel Luis ( Semtech )
- *
- * \author    Gregory Cristian ( Semtech )
- */
+/*
+ / _____)             _              | |
+( (____  _____ ____ _| |_ _____  ____| |__
+ \____ \| ___ |    (_   _) ___ |/ ___)  _ \
+ _____) ) ____| | | || |_| ____( (___| | | |
+(______/|_____)_|_|_| \__)_____)\____)_| |_|
+    (C)2013 Semtech
+
+Description: Generic radio driver definition
+
+License: Revised BSD License, see LICENSE.TXT file include in the project
+
+Maintainer: Miguel Luis and Gregory Cristian
+*/
 #ifndef __RADIO_H__
 #define __RADIO_H__
-
-#include <stdint.h>
-#include <stdbool.h>
 
 /*!
  * Radio driver supported modems
@@ -40,10 +29,10 @@ typedef enum
  */
 typedef enum
 {
-    RF_IDLE = 0,   //!< The radio is idle
-    RF_RX_RUNNING, //!< The radio is in reception state
-    RF_TX_RUNNING, //!< The radio is in transmission state
-    RF_CAD,        //!< The radio is doing channel activity detection
+    RF_IDLE = 0,
+    RF_RX_RUNNING,
+    RF_TX_RUNNING,
+    RF_CAD,
 }RadioState_t;
 
 /*!
@@ -98,12 +87,26 @@ typedef struct
  */
 struct Radio_s
 {
-    /*!
+      /*!
      * \brief Initializes the radio
      *
      * \param [IN] events Structure containing the driver callback functions
      */
-    void    ( *Init )( RadioEvents_t *events );
+    void    ( *IoInit )( void );
+  
+        /*!
+     * \brief Initializes the radio
+     *
+     * \param [IN] events Structure containing the driver callback functions
+     */
+    void    ( *IoDeInit )( void );
+    /*!
+     * \brief Initializes the radio
+     *
+     * \param [IN] events Structure containing the driver callback functions
+     * \param [OUT] returns radioWakeUpTime
+     */
+    uint32_t    ( *Init )( RadioEvents_t *events );
     /*!
      * Return current radio status
      *
@@ -113,7 +116,7 @@ struct Radio_s
     /*!
      * \brief Configures the radio with the given modem
      *
-     * \param [IN] modem Modem to be used [0: FSK, 1: LoRa]
+     * \param [IN] modem Modem to be used [0: FSK, 1: LoRa] 
      */
     void    ( *SetModem )( RadioModems_t modem );
     /*!
@@ -123,20 +126,19 @@ struct Radio_s
      */
     void    ( *SetChannel )( uint32_t freq );
     /*!
-     * \brief Checks if the channel is free for the given time
+     * \brief Sets the channels configuration
      *
      * \param [IN] modem      Radio modem to be used [0: FSK, 1: LoRa]
      * \param [IN] freq       Channel RF frequency
      * \param [IN] rssiThresh RSSI threshold
-     * \param [IN] maxCarrierSenseTime Max time while the RSSI is measured
      *
      * \retval isFree         [true: Channel is free, false: Channel is not free]
      */
-    bool    ( *IsChannelFree )( RadioModems_t modem, uint32_t freq, int16_t rssiThresh, uint32_t maxCarrierSenseTime );
+    bool    ( *IsChannelFree )( RadioModems_t modem, uint32_t freq, int16_t rssiThresh );
     /*!
      * \brief Generates a 32 bits random value based on the RSSI readings
      *
-     * \remark This function sets the radio in LoRa modem mode and disables
+     * \remark This function sets the radio in LoRa modem mode and disables 
      *         all interrupts.
      *         After calling this function either Radio.SetRxConfig or
      *         Radio.SetTxConfig functions must be called.
@@ -151,30 +153,30 @@ struct Radio_s
      * \param [IN] bandwidth    Sets the bandwidth
      *                          FSK : >= 2600 and <= 250000 Hz
      *                          LoRa: [0: 125 kHz, 1: 250 kHz,
-     *                                 2: 500 kHz, 3: Reserved]
+     *                                 2: 500 kHz, 3: Reserved] 
      * \param [IN] datarate     Sets the Datarate
      *                          FSK : 600..300000 bits/s
      *                          LoRa: [6: 64, 7: 128, 8: 256, 9: 512,
      *                                10: 1024, 11: 2048, 12: 4096  chips]
      * \param [IN] coderate     Sets the coding rate (LoRa only)
      *                          FSK : N/A ( set to 0 )
-     *                          LoRa: [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8]
-     * \param [IN] bandwidthAfc Sets the AFC Bandwidth (FSK only)
+     *                          LoRa: [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8] 
+     * \param [IN] bandwidthAfc Sets the AFC Bandwidth (FSK only) 
      *                          FSK : >= 2600 and <= 250000 Hz
-     *                          LoRa: N/A ( set to 0 )
+     *                          LoRa: N/A ( set to 0 ) 
      * \param [IN] preambleLen  Sets the Preamble length
-     *                          FSK : Number of bytes
+     *                          FSK : Number of bytes 
      *                          LoRa: Length in symbols (the hardware adds 4 more symbols)
-     * \param [IN] symbTimeout  Sets the RxSingle timeout value
-     *                          FSK : timeout in number of bytes
+     * \param [IN] symbTimeout  Sets the RxSingle timeout value (LoRa only) 
+     *                          FSK : N/A ( set to 0 ) 
      *                          LoRa: timeout in symbols
      * \param [IN] fixLen       Fixed length packets [0: variable, 1: fixed]
      * \param [IN] payloadLen   Sets payload length when fixed length is used
      * \param [IN] crcOn        Enables/Disables the CRC [0: OFF, 1: ON]
-     * \param [IN] freqHopOn    Enables disables the intra-packet frequency hopping
+     * \param [IN] FreqHopOn    Enables disables the intra-packet frequency hopping
      *                          FSK : N/A ( set to 0 )
      *                          LoRa: [0: OFF, 1: ON]
-     * \param [IN] hopPeriod    Number of symbols between each hop
+     * \param [IN] HopPeriod    Number of symbols between each hop
      *                          FSK : N/A ( set to 0 )
      *                          LoRa: Number of symbols
      * \param [IN] iqInverted   Inverts IQ signals (LoRa only)
@@ -188,12 +190,12 @@ struct Radio_s
                               uint32_t bandwidthAfc, uint16_t preambleLen,
                               uint16_t symbTimeout, bool fixLen,
                               uint8_t payloadLen,
-                              bool crcOn, bool freqHopOn, uint8_t hopPeriod,
+                              bool crcOn, bool FreqHopOn, uint8_t HopPeriod,
                               bool iqInverted, bool rxContinuous );
     /*!
      * \brief Sets the transmission parameters
      *
-     * \param [IN] modem        Radio modem to be used [0: FSK, 1: LoRa]
+     * \param [IN] modem        Radio modem to be used [0: FSK, 1: LoRa] 
      * \param [IN] power        Sets the output power [dBm]
      * \param [IN] fdev         Sets the frequency deviation (FSK only)
      *                          FSK : [Hz]
@@ -201,23 +203,23 @@ struct Radio_s
      * \param [IN] bandwidth    Sets the bandwidth (LoRa only)
      *                          FSK : 0
      *                          LoRa: [0: 125 kHz, 1: 250 kHz,
-     *                                 2: 500 kHz, 3: Reserved]
+     *                                 2: 500 kHz, 3: Reserved] 
      * \param [IN] datarate     Sets the Datarate
      *                          FSK : 600..300000 bits/s
      *                          LoRa: [6: 64, 7: 128, 8: 256, 9: 512,
      *                                10: 1024, 11: 2048, 12: 4096  chips]
      * \param [IN] coderate     Sets the coding rate (LoRa only)
      *                          FSK : N/A ( set to 0 )
-     *                          LoRa: [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8]
+     *                          LoRa: [1: 4/5, 2: 4/6, 3: 4/7, 4: 4/8] 
      * \param [IN] preambleLen  Sets the preamble length
-     *                          FSK : Number of bytes
+     *                          FSK : Number of bytes 
      *                          LoRa: Length in symbols (the hardware adds 4 more symbols)
      * \param [IN] fixLen       Fixed length packets [0: variable, 1: fixed]
      * \param [IN] crcOn        Enables disables the CRC [0: OFF, 1: ON]
-     * \param [IN] freqHopOn    Enables disables the intra-packet frequency hopping
+     * \param [IN] FreqHopOn    Enables disables the intra-packet frequency hopping
      *                          FSK : N/A ( set to 0 )
      *                          LoRa: [0: OFF, 1: ON]
-     * \param [IN] hopPeriod    Number of symbols between each hop
+     * \param [IN] HopPeriod    Number of symbols between each hop
      *                          FSK : N/A ( set to 0 )
      *                          LoRa: Number of symbols
      * \param [IN] iqInverted   Inverts IQ signals (LoRa only)
@@ -225,11 +227,11 @@ struct Radio_s
      *                          LoRa: [0: not inverted, 1: inverted]
      * \param [IN] timeout      Transmission timeout [ms]
      */
-    void    ( *SetTxConfig )( RadioModems_t modem, int8_t power, uint32_t fdev,
+    void    ( *SetTxConfig )( RadioModems_t modem, int8_t power, uint32_t fdev, 
                               uint32_t bandwidth, uint32_t datarate,
                               uint8_t coderate, uint16_t preambleLen,
-                              bool fixLen, bool crcOn, bool freqHopOn,
-                              uint8_t hopPeriod, bool iqInverted, uint32_t timeout );
+                              bool fixLen, bool crcOn, bool FreqHopOn,
+                              uint8_t HopPeriod, bool iqInverted, uint32_t timeout );
     /*!
      * \brief Checks if the given RF frequency is supported by the hardware
      *
@@ -294,14 +296,14 @@ struct Radio_s
      * \param [IN]: addr Register address
      * \param [IN]: data New register value
      */
-    void    ( *Write )( uint16_t addr, uint8_t data );
+    void    ( *Write )( uint8_t addr, uint8_t data );
     /*!
      * \brief Reads the radio register at the specified address
      *
      * \param [IN]: addr Register address
      * \retval data Register value
      */
-    uint8_t ( *Read )( uint16_t addr );
+    uint8_t ( *Read )( uint8_t addr );
     /*!
      * \brief Writes multiple radio registers starting at address
      *
@@ -309,7 +311,7 @@ struct Radio_s
      * \param [IN] buffer Buffer containing the new register's values
      * \param [IN] size   Number of registers to be written
      */
-    void    ( *WriteBuffer )( uint16_t addr, uint8_t *buffer, uint8_t size );
+    void    ( *WriteBuffer )( uint8_t addr, uint8_t *buffer, uint8_t size );
     /*!
      * \brief Reads multiple radio registers starting at address
      *
@@ -317,53 +319,22 @@ struct Radio_s
      * \param [OUT] buffer Buffer where to copy the registers data
      * \param [IN] size Number of registers to be read
      */
-    void    ( *ReadBuffer )( uint16_t addr, uint8_t *buffer, uint8_t size );
+    void    ( *ReadBuffer )( uint8_t addr, uint8_t *buffer, uint8_t size );
     /*!
+     * \brief Set synchro word in radio
+     *
+     * \param [IN] data  THe syncword
+     */		
+		void    ( *SetSyncWord )( uint8_t data );
+    
+	/*!
      * \brief Sets the maximum payload length.
      *
      * \param [IN] modem      Radio modem to be used [0: FSK, 1: LoRa]
      * \param [IN] max        Maximum payload length in bytes
      */
-    void    ( *SetMaxPayloadLength )( RadioModems_t modem, uint8_t max );
-    /*!
-     * \brief Sets the network to public or private. Updates the sync byte.
-     *
-     * \remark Applies to LoRa modem only
-     *
-     * \param [IN] enable if true, it enables a public network
-     */
-    void    ( *SetPublicNetwork )( bool enable );
-    /*!
-     * \brief Gets the time required for the board plus radio to get out of sleep.[ms]
-     *
-     * \retval time Radio plus board wakeup time in ms.
-     */
-    uint32_t  ( *GetWakeupTime )( void );
-    /*!
-     * \brief Process radio irq
-     */
-    void ( *IrqProcess )( void );
-    /*
-     * The next functions are available only on SX126x radios.
-     */
-    /*!
-     * \brief Sets the radio in reception mode with Max LNA gain for the given time
-     *
-     * \remark Available on SX126x radios only.
-     *
-     * \param [IN] timeout Reception timeout [ms]
-     *                     [0: continuous, others timeout]
-     */
-    void    ( *RxBoosted )( uint32_t timeout );
-    /*!
-     * \brief Sets the Rx duty cycle management parameters
-     *
-     * \remark Available on SX126x radios only.
-     *
-     * \param [in]  rxTime        Structure describing reception timeout value
-     * \param [in]  sleepTime     Structure describing sleep timeout value
-     */
-    void ( *SetRxDutyCycle ) ( uint32_t rxTime, uint32_t sleepTime );
+    void ( *SetMaxPayloadLength )( RadioModems_t modem, uint8_t max );
+
 };
 
 /*!
