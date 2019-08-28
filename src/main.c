@@ -32,31 +32,23 @@
   */
 /* Includes ------------------------------------------------------------------*/
 #include "includes.h"
-
-/* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
+#include "uart.h"
+#include "spi.h"
+#include "gpio.h"
 
 /* Private variables ---------------------------------------------------------*/
 
-
-
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_SPI1_Init(void);
-static void MX_SPI2_Init(void);
-static void MX_SPI4_Init(void);
-static void MX_USART2_UART_Init(void);
+
+extern SPI_HandleTypeDef hspi2;
+extern SPI_HandleTypeDef hspi4;
 
 /**
   * Initializes the Global MSP.
   */
 void HAL_MspInit(void)
 {
-  /* USER CODE BEGIN MspInit 0 */
-
-  /* USER CODE END MspInit 0 */
 
   HAL_NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP_4);
 
@@ -64,10 +56,11 @@ void HAL_MspInit(void)
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 
-  /* USER CODE BEGIN MspInit 1 */
-
-  /* USER CODE END MspInit 1 */
 }
+
+uint8_t ReadyMsg[] = "READY";
+char msgBuf[100];
+char loraBuf[50];
 
 int main(void)
 {
@@ -87,10 +80,9 @@ int main(void)
 
   while (1)
   {
-
+	  HAL_SPI_TransmitReceive(&hspi2, (uint8_t*)ReadyMsg, (uint8_t *)msgBuf, 7, 5000);
+	  HAL_SPI_TransmitReceive(&hspi4, (uint8_t*)msgBuf, (uint8_t *)loraBuf, 7, 5000);
   }
-
-
 }
 
 /** System Clock Configuration
@@ -128,12 +120,6 @@ void SystemClock_Config(void)
 }
 
 
-
-
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
 
 #ifdef USE_FULL_ASSERT
 
