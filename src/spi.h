@@ -5,6 +5,33 @@
  *      Author: Larraitz
  */
 
+/*!
+ * SPI peripheral ID
+ */
+
+#include "gpio.h"
+#include "includes.h"
+
+typedef enum
+{
+    SPI_1,
+    SPI_2,
+}SpiId_t;
+
+
+/*!
+ * SPI object type definition
+ */
+typedef struct Spi_s
+{
+    SpiId_t SpiId;
+    Gpio_t Mosi;
+    Gpio_t Miso;
+    Gpio_t Sclk;
+    Gpio_t Nss;
+}Spi_t;
+
+
 #define DMAx_CLK_ENABLE()                __HAL_RCC_DMA2_CLK_ENABLE()
 
 /* Definition for SPIx's DMA */

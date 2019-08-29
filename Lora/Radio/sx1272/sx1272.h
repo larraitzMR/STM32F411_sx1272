@@ -141,8 +141,11 @@ typedef struct SX1272_s
     Gpio_t        DIO4;
     Gpio_t        DIO5;
     Spi_t         Spi;
+    uint8_t       RxTx;
     RadioSettings_t Settings;
 }SX1272_t;
+
+extern SX1272_t SX1272;
 
 /*!
  * Hardware IO IRQ callback function definition

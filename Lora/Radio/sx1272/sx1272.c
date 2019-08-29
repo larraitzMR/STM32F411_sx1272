@@ -30,7 +30,7 @@
 #include "radio.h"
 #include "delay.h"
 #include "sx1272.h"
-#include "lora.h"
+#include "lora_init.h"
 
 /*
  * Local types definition

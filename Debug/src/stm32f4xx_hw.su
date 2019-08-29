@@ -1,0 +1,11 @@
+stm32f4xx_hw.c:43:6:HW_Init	4	static
+stm32f4xx_hw.c:71:6:HW_DeInit	4	static
+stm32f4xx_hw.c:143:10:HW_GetRandomSeed	4	static
+stm32f4xx_hw.c:153:6:HW_GetUniqueId	16	static
+stm32f4xx_hw.c:170:9:HW_GetBatteryLevel	4	static
+stm32f4xx_hw.c:207:6:HW_AdcInit	4	static
+stm32f4xx_hw.c:250:6:HW_AdcDeInit	4	static
+stm32f4xx_hw.c:260:10:HW_AdcReadChannel	16	static
+stm32f4xx_hw.c:308:6:HW_EnterStopMode	4	static
+stm32f4xx_hw.c:330:6:HW_ExitStopMode	4	static
+stm32f4xx_hw.c:368:6:HW_EnterSleepMode	4	static

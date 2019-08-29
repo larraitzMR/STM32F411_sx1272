@@ -35,9 +35,9 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
-#define BOARD_WAKEUP_TIME  3 //TCXO
-#define MLM_TCXO_ON()   HW_GPIO_Write( RADIO_TCXO_VCC_PORT, RADIO_TCXO_VCC_PIN, 1) 
-#define MLM_TCXO_OFF()  HW_GPIO_Write( RADIO_TCXO_VCC_PORT, RADIO_TCXO_VCC_PIN, 0) 
+//#define BOARD_WAKEUP_TIME  3 //TCXO
+////#define MLM_TCXO_ON()   HW_GPIO_Write( RADIO_TCXO_VCC_PORT, RADIO_TCXO_VCC_PIN, 1)
+////#define MLM_TCXO_OFF()  HW_GPIO_Write( RADIO_TCXO_VCC_PORT, RADIO_TCXO_VCC_PIN, 0)
 /*!
  * \brief Radio hardware registers initialization definition
  *

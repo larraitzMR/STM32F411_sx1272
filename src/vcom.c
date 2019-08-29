@@ -90,7 +90,7 @@ void vcom_Init(void)
   if(HAL_UART_Init(&UartHandle) != HAL_OK)
   {
     /* Initialization Error */
-    Error_Handler(); 
+    //Error_Handler();
   }
   
   HAL_NVIC_SetPriority(USARTX_IRQn, 0x1, 0);

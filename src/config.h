@@ -16,6 +16,30 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 
+#define RCC_GPIO_CLK_ENABLE( __GPIO_PORT__ )              \
+do {                                                    \
+    switch( __GPIO_PORT__)                                \
+    {                                                     \
+      case GPIOA_BASE: __HAL_RCC_GPIOA_CLK_ENABLE(); break;    \
+      case GPIOB_BASE: __HAL_RCC_GPIOB_CLK_ENABLE(); break;    \
+      case GPIOC_BASE: __HAL_RCC_GPIOC_CLK_ENABLE(); break;    \
+      case GPIOD_BASE: __HAL_RCC_GPIOD_CLK_ENABLE(); break;    \
+      case GPIOH_BASE: default:  __HAL_RCC_GPIOH_CLK_ENABLE(); \
+    }                                                    \
+  } while(0)
+
+#define RCC_GPIO_CLK_DISABLE( __GPIO_PORT__ )              \
+do {                                                    \
+    switch( __GPIO_PORT__)                                \
+    {                                                     \
+      case GPIOA_BASE: __HAL_RCC_GPIOA_CLK_DISABLE(); break;    \
+      case GPIOB_BASE: __HAL_RCC_GPIOB_CLK_DISABLE(); break;    \
+      case GPIOC_BASE: __HAL_RCC_GPIOC_CLK_DISABLE(); break;    \
+      case GPIOD_BASE: __HAL_RCC_GPIOD_CLK_DISABLE(); break;    \
+      case GPIOH_BASE: default:  __HAL_RCC_GPIOH_CLK_ENABLE(); \
+    }                                                    \
+  } while(0)
+
 //#define RADIO_DIO_4
 //#define RADIO_DIO_5
 

@@ -15,29 +15,29 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, DATA
   5 .data         0000000c  20000000  08001e28  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  6 .bss          00000200  2000000c  08001e34  0002000c  2**2
+  6 .bss          00000318  2000000c  08001e34  0002000c  2**2
                   ALLOC
-  7 ._user_heap_stack 00000400  2000020c  08001e34  0002020c  2**0
+  7 ._user_heap_stack 00000400  20000324  08001e34  00020324  2**0
                   ALLOC
   8 .ARM.attributes 00000030  00000000  00000000  0002000c  2**0
                   CONTENTS, READONLY
-  9 .debug_info   0000da8d  00000000  00000000  0002003c  2**0
+  9 .debug_info   0000e28c  00000000  00000000  0002003c  2**0
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_abbrev 00001d9d  00000000  00000000  0002dac9  2**0
+ 10 .debug_abbrev 00001dbe  00000000  00000000  0002e2c8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_aranges 000007e8  00000000  00000000  0002f868  2**3
+ 11 .debug_aranges 000007e8  00000000  00000000  00030088  2**3
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000720  00000000  00000000  00030050  2**3
+ 12 .debug_ranges 00000720  00000000  00000000  00030870  2**3
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_line   000040cb  00000000  00000000  00030770  2**0
+ 13 .debug_line   00004125  00000000  00000000  00030f90  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_str    000027b5  00000000  00000000  0003483b  2**0
+ 14 .debug_str    00002a03  00000000  00000000  000350b5  2**0
                   CONTENTS, READONLY, DEBUGGING
- 15 .comment      0000007c  00000000  00000000  00036ff0  2**0
+ 15 .comment      0000007c  00000000  00000000  00037ab8  2**0
                   CONTENTS, READONLY
- 16 .debug_frame  00001f50  00000000  00000000  0003706c  2**2
+ 16 .debug_frame  00001f50  00000000  00000000  00037b34  2**2
                   CONTENTS, READONLY, DEBUGGING
- 17 .stabstr      0000003f  00000000  00000000  00038fbc  2**0
+ 17 .stabstr      0000003f  00000000  00000000  00039a84  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -4131,11 +4131,11 @@ int main(void)
  80019fe:	f7ff fa97 	bl	8000f30 <HAL_SPI_TransmitReceive>
 	  HAL_SPI_TransmitReceive(&hspi2, (uint8_t*)ReadyMsg, (uint8_t *)msgBuf, 7, 5000);
  8001a02:	e7ec      	b.n	80019de <main+0x22>
- 8001a04:	20000060 	.word	0x20000060
+ 8001a04:	20000128 	.word	0x20000128
  8001a08:	20000000 	.word	0x20000000
- 8001a0c:	200000c4 	.word	0x200000c4
- 8001a10:	2000002c 	.word	0x2000002c
- 8001a14:	2000011c 	.word	0x2000011c
+ 8001a0c:	200001dc 	.word	0x200001dc
+ 8001a10:	200000f4 	.word	0x200000f4
+ 8001a14:	20000234 	.word	0x20000234
 
 08001a18 <SystemClock_Config>:
 }
@@ -4312,7 +4312,7 @@ void SPI1_Init(void)
 }
  8001b20:	bf00      	nop
  8001b22:	bd80      	pop	{r7, pc}
- 8001b24:	20000174 	.word	0x20000174
+ 8001b24:	2000028c 	.word	0x2000028c
  8001b28:	40013000 	.word	0x40013000
 
 08001b2c <SPI2_Init>:
@@ -4378,7 +4378,7 @@ void SPI2_Init(void)
 }
  8001b80:	bf00      	nop
  8001b82:	bd80      	pop	{r7, pc}
- 8001b84:	200000c4 	.word	0x200000c4
+ 8001b84:	200001dc 	.word	0x200001dc
  8001b88:	40003800 	.word	0x40003800
 
 08001b8c <SPI4_Init>:
@@ -4443,7 +4443,7 @@ void SPI4_Init(void)
 }
  8001be0:	bf00      	nop
  8001be2:	bd80      	pop	{r7, pc}
- 8001be4:	2000011c 	.word	0x2000011c
+ 8001be4:	20000234 	.word	0x20000234
  8001be8:	40013400 	.word	0x40013400
 
 08001bec <Reset_Handler>:
@@ -4531,7 +4531,7 @@ LoopFillZerobss:
   ldr  r2, =_sbss
  8001c34:	2000000c 	.word	0x2000000c
   ldr  r3, = _ebss
- 8001c38:	2000020c 	.word	0x2000020c
+ 8001c38:	20000324 	.word	0x20000324
 
 08001c3c <ADC_IRQHandler>:
  * @retval None       
@@ -4672,7 +4672,7 @@ void USART2_UART_Init(void)
  8001cea:	bf00      	nop
  8001cec:	bd80      	pop	{r7, pc}
  8001cee:	bf00      	nop
- 8001cf0:	200001cc 	.word	0x200001cc
+ 8001cf0:	200002e4 	.word	0x200002e4
  8001cf4:	40004400 	.word	0x40004400
 
 08001cf8 <HAL_UART_MspInit>:
