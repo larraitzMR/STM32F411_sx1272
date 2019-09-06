@@ -99,7 +99,7 @@ void SX1272IoInit( void )
 //  HW_GPIO_Init( RADIO_DIO_4_PORT, RADIO_DIO_4_PIN, &initStruct );
 //  HW_GPIO_Init( RADIO_DIO_5_PORT, RADIO_DIO_5_PIN, &initStruct );
   
-  initStruct.Mode =GPIO_MODE_OUTPUT_PP;
+  initStruct.Mode = GPIO_MODE_OUTPUT_PP;
   initStruct.Pull = GPIO_NOPULL;  
   GPIO_Init( RADIO_TCXO_VCC_PORT, RADIO_TCXO_VCC_PIN, &initStruct );
 }
@@ -227,42 +227,42 @@ uint8_t SX1272GetPaSelect( uint32_t channel )
 //  }
 //}
 
-static void SX1272AntSwInit( void )
-{
-  GPIO_InitTypeDef initStruct={0};
-
-  initStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  initStruct.Pull = GPIO_PULLUP; //GPIO_NOPULL;
-  initStruct.Speed = GPIO_SPEED_HIGH;
-  
-  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, &initStruct  ); 
-  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, 0);
-  
-  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, &initStruct  ); 
-  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, 0);
-  
-  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, &initStruct  ); 
-  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, 0);
-}
-
-static void SX1272AntSwDeInit( void )
-{
-  GPIO_InitTypeDef initStruct={0};
-
-  initStruct.Mode = GPIO_MODE_ANALOG ;
-  
-  initStruct.Pull = GPIO_NOPULL;
-  initStruct.Speed = GPIO_SPEED_HIGH;
-
-  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, &initStruct  ); 
-  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, 0);
-  
-  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, &initStruct  ); 
-  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, 0);
-  
-  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, &initStruct  ); 
-  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, 0);
-}
+//static void SX1272AntSwInit( void )
+//{
+//  GPIO_InitTypeDef initStruct={0};
+//
+//  initStruct.Mode = GPIO_MODE_OUTPUT_PP;
+//  initStruct.Pull = GPIO_PULLUP; //GPIO_NOPULL;
+//  initStruct.Speed = GPIO_SPEED_HIGH;
+//
+//  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, &initStruct  );
+//  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, 0);
+//
+//  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, &initStruct  );
+//  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, 0);
+//
+//  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, &initStruct  );
+//  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, 0);
+//}
+//
+//static void SX1272AntSwDeInit( void )
+//{
+//  GPIO_InitTypeDef initStruct={0};
+//
+//  initStruct.Mode = GPIO_MODE_ANALOG ;
+//
+//  initStruct.Pull = GPIO_NOPULL;
+//  initStruct.Speed = GPIO_SPEED_HIGH;
+//
+//  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, &initStruct  );
+//  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, 0);
+//
+//  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, &initStruct  );
+//  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, 0);
+//
+//  HW_GPIO_Init( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, &initStruct  );
+//  HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, 0);
+//}
 
 void SX1272SetAntSw( uint8_t opMode )
 {
@@ -272,11 +272,11 @@ void SX1272SetAntSw( uint8_t opMode )
     case RFLR_OPMODE_TRANSMITTER:
       if( ( paConfig & RF_PACONFIG_PASELECT_PABOOST ) == RF_PACONFIG_PASELECT_PABOOST )
       {
-        HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, 1 );
+        GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_BOOST, RADIO_ANT_SWITCH_PIN_TX_BOOST, 1 );
       }
       else
       {
-        HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, 1 );
+        GPIO_Write( RADIO_ANT_SWITCH_PORT_TX_RFO, RADIO_ANT_SWITCH_PIN_TX_RFO, 1 );
       }
       //SX1272.RxTx = 1;
 	  break;
@@ -285,7 +285,7 @@ void SX1272SetAntSw( uint8_t opMode )
     case RFLR_OPMODE_CAD:
     default:
     	SX1272.RxTx = 0;
-        HW_GPIO_Write( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, 1 );
+        GPIO_Write( RADIO_ANT_SWITCH_PORT_RX, RADIO_ANT_SWITCH_PIN_RX, 1 );
         break;
     }
   

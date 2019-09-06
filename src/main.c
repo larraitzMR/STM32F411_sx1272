@@ -154,6 +154,22 @@ void OnRxError( void );
  * \brief Function executed on when led timer elapses
  */
 static void OnledEvent( void );
+
+#define BUFFERSIZE 6
+#define RXBUFFSIZE 200
+
+/* Buffer used for reception */
+uint8_t aRxBuffer[BUFFERSIZE];
+char EpcBuf[RXBUFFSIZE];
+
+char ReadyBuf[5];
+extern int ready;
+extern uint8_t ReadyMsg[];
+char buff[8];
+
+extern SPI_HandleTypeDef hspi1;
+extern SPI_HandleTypeDef hspi2;
+
 /**
  * Main application entry point.
  */
@@ -165,6 +181,13 @@ int main( void )
   HAL_Init( );
 
   SystemClock_Config( );
+  SPI_Init(&hspi1);
+  SPI_Init(&hspi2);
+
+  //SPI Lora
+  SPI1_Init();
+  //SPI Variscite
+  SPI2_Init();
 
 //  DBG_Init( );
 
@@ -213,6 +236,9 @@ int main( void )
 #endif
 
   Radio.Rx( RX_TIMEOUT_VALUE );
+
+  HAL_SPI_TransmitReceive(&hspi2, (uint8_t*)ReadyMsg, (uint8_t *)EpcBuf, 7, 5000);
+  HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)EpcBuf, (uint8_t *)ReadyBuf, 7, 5000);
 
   while( 1 )
   {
