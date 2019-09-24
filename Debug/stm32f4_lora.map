@@ -1998,17 +1998,17 @@ OUTPUT(stm32f4_lora.elf elf32-littlearm)
  .debug_ranges  0x000004e8       0x18 src\system_stm32f4xx.o
  .debug_ranges  0x00000500       0x50 src\vcom.o
 
-.debug_line     0x00000000     0x2ef4
+.debug_line     0x00000000     0x2ef6
  .debug_line    0x00000000      0x45d Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
  .debug_line    0x0000045d      0x5c3 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_cortex.o
  .debug_line    0x00000a20      0x455 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_gpio.o
  .debug_line    0x00000e75      0x5e2 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_rcc.o
  .debug_line    0x00001457      0xbab Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal_uart.o
  .debug_line    0x00002002      0x3c5 src\lora_init.o
- .debug_line    0x000023c7      0x46a src\main.o
- .debug_line    0x00002831       0x7b src\startup_stm32f411xe.o
- .debug_line    0x000028ac      0x1d3 src\system_stm32f4xx.o
- .debug_line    0x00002a7f      0x475 src\vcom.o
+ .debug_line    0x000023c7      0x46c src\main.o
+ .debug_line    0x00002833       0x7b src\startup_stm32f411xe.o
+ .debug_line    0x000028ae      0x1d3 src\system_stm32f4xx.o
+ .debug_line    0x00002a81      0x475 src\vcom.o
 
 .debug_str      0x00000000     0x26bc
  .debug_str     0x00000000      0xcb9 Drivers\STM32F4xx_HAL_Driver\Src\stm32f4xx_hal.o
