@@ -1,0 +1,7 @@
+gpio.c:12:6:GPIO_Ports_Init	24	static
+gpio.c:40:6:GPIO_Init	48	static
+gpio.c:61:6:GPIO_SetIrq	32	static
+gpio.c:87:6:GPIO_IrqHandler	24	static
+gpio.c:106:6:GPIO_Write	24	static
+gpio.c:120:10:GPIO_Read	16	static
+gpio.c:134:16:GPIO_GetBitPos	24	static

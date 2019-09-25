@@ -11,6 +11,12 @@ RM := rm -rf
 -include Startup/subdir.mk
 -include Src/subdir.mk
 -include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
+-include Drivers/Lora/Utilities/subdir.mk
+-include Drivers/Lora/Radio/sx1272/subdir.mk
+-include Drivers/Lora/Mac/region/subdir.mk
+-include Drivers/Lora/Mac/subdir.mk
+-include Drivers/Lora/Crypto/subdir.mk
+-include Drivers/Lora/Core/subdir.mk
 -include subdir.mk
 -include objects.mk
 
@@ -37,8 +43,8 @@ stm32f4_lora.list \
 all: stm32f4_lora.elf secondary-outputs
 
 # Tool invocations
-stm32f4_lora.elf: $(OBJS) $(USER_OBJS) C:\Users\Propietario\STM32CubeIDE\workspace_1.0.2\stm32f4_lora\STM32F411VETX_FLASH.ld
-	arm-none-eabi-gcc -o "stm32f4_lora.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Propietario\STM32CubeIDE\workspace_1.0.2\stm32f4_lora\STM32F411VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f4_lora.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+stm32f4_lora.elf: $(OBJS) $(USER_OBJS) C:\Users\Propietario\Documents\GitHub\STM32F411_sx1272\stm32f4_lora\STM32F411VETX_FLASH.ld
+	arm-none-eabi-gcc -o "stm32f4_lora.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Propietario\Documents\GitHub\STM32F411_sx1272\stm32f4_lora\STM32F411VETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="stm32f4_lora.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

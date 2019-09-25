@@ -16,6 +16,12 @@ C_DEPS :=
 
 # Every subdirectory with source files must be described here
 SUBDIRS := \
+Drivers/Lora/Core \
+Drivers/Lora/Crypto \
+Drivers/Lora/Mac \
+Drivers/Lora/Mac/region \
+Drivers/Lora/Radio/sx1272 \
+Drivers/Lora/Utilities \
 Drivers/STM32F4xx_HAL_Driver/Src \
 Src \
 Startup \

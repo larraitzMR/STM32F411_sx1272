@@ -53,14 +53,33 @@ extern "C" {
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
-/* USER CODE BEGIN EFP */
+#ifndef MAIN_H_
+#define MAIN_H_
 
-/* USER CODE END EFP */
+/* LORA I/O definition */
 
-/* Private defines -----------------------------------------------------------*/
-/* USER CODE BEGIN Private defines */
 
-/* USER CODE END Private defines */
+#define RADIO_MOSI_PORT                           GPIOA
+#define RADIO_MOSI_PIN                            GPIO_PIN_7
+
+#define RADIO_MISO_PORT                           GPIOA
+#define RADIO_MISO_PIN                            GPIO_PIN_6
+
+#define RADIO_SCLK_PORT                           GPIOA
+#define RADIO_SCLK_PIN                            GPIO_PIN_5
+
+#define RADIO_NSS_PORT                            GPIOA
+#define RADIO_NSS_PIN                             GPIO_PIN_4
+
+#define RADIO_DIO_0_PORT                          GPIOA
+#define RADIO_DIO_0_PIN                           GPIO_PIN_1
+
+#define RADIO_DIO_1_PORT                          GPIOA
+#define RADIO_DIO_1_PIN                           GPIO_PIN_0
+
+
+#endif /* MAIN_H_ */
+
 
 #ifdef __cplusplus
 }
