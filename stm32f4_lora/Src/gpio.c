@@ -62,13 +62,13 @@ void GPIO_SetIrq( GPIO_TypeDef* GPIOx, uint16_t GPIO_Pin, uint32_t prio,  GpioIr
 {
   IRQn_Type IRQnb;
 
-  uint32_t BitPos = HW_GPIO_GetBitPos( GPIO_Pin ) ;
+//  uint32_t BitPos = HW_GPIO_GetBitPos( GPIO_Pin ) ;
 
   if ( irqHandler != NULL)
   {
-    GpioIrq[ BitPos ] = irqHandler;
+//    GpioIrq[ BitPos ] = irqHandler;
 
-    IRQnb = MSP_GetIRQn( GPIO_Pin );
+    //IRQnb = MSP_GetIRQn( GPIO_Pin );
 
     HAL_NVIC_SetPriority( IRQnb , prio, 0);
 

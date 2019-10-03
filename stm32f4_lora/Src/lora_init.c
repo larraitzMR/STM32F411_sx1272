@@ -130,6 +130,50 @@ void SX1272IoDeInit( void )
 //  HW_GPIO_Init( RADIO_DIO_5_PORT, RADIO_DIO_5_PIN, &initStruct );
 }
 
+/*!
+ * \brief Enables/disables the TCXO if available on board design.
+ *
+ * \param [IN] state TCXO enabled when true and disabled when false.
+ */
+static void SX1272SetBoardTcxo( uint8_t state )
+{
+    // No TCXO component available on this board design.
+#if 0
+    if( state == true )
+    {
+        TCXO_ON( );
+        DelayMs( BOARD_TCXO_WAKEUP_TIME );
+    }
+    else
+    {
+        TCXO_OFF( );
+    }
+#endif
+}
+
+uint32_t SX1272GetBoardTcxoWakeupTime( void )
+{
+   // return BOARD_TCXO_WAKEUP_TIME;
+}
+
+void SX1272Reset( void )
+{
+    // Enables the TCXO if available on the board design
+    SX1272SetBoardTcxo( true );
+
+    // Set RESET pin to 1
+   // GpioInit( &SX1272.Reset, RADIO_RESET, PIN_OUTPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
+
+    // Wait 1 ms
+    DelayMs( 1 );
+
+    // Configure RESET as input
+    //GpioInit( &SX1272.Reset, RADIO_RESET, PIN_INPUT, PIN_PUSH_PULL, PIN_NO_PULL, 1 );
+
+    // Wait 6 ms
+    DelayMs( 6 );
+}
+
 void SX1272SetRfTxPower( int8_t power )
 {
     uint8_t paConfig = 0;

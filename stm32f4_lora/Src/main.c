@@ -1,352 +1,472 @@
-/* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2019 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
-
+ ******************************************************************************
+ * File Name          : main.c
+ * Description        : Main program body
+ ******************************************************************************
+ *
+ * COPYRIGHT(c) 2019 STMicroelectronics
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *   1. Redistributions of source code must retain the above copyright notice,
+ *      this list of conditions and the following disclaimer.
+ *   2. Redistributions in binary form must reproduce the above copyright notice,
+ *      this list of conditions and the following disclaimer in the documentation
+ *      and/or other materials provided with the distribution.
+ *   3. Neither the name of STMicroelectronics nor the names of its contributors
+ *      may be used to endorse or promote products derived from this software
+ *      without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ ******************************************************************************
+ */
 /* Includes ------------------------------------------------------------------*/
-#include "main.h"
+#include "includes.h"
+#include "timeServer.h"
+#include "uart.h"
+#include "spi.h"
+#include "gpio.h"
+#include "delay.h"
+#include "radio.h"
+#include "vcom.h"
 
-/* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */
 
-/* USER CODE END Includes */
+#if defined( USE_BAND_868 )
 
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
+#define RF_FREQUENCY                                868000000 // Hz
 
-/* USER CODE END PTD */
+#elif defined( USE_BAND_915 )
 
-/* Private define ------------------------------------------------------------*/
-/* USER CODE BEGIN PD */
+#define RF_FREQUENCY                                915000000 // Hz
 
-/* USER CODE END PD */
+#else
+    #error "Please define a frequency band in the compiler options."
+#endif
 
-/* Private macro -------------------------------------------------------------*/
-/* USER CODE BEGIN PM */
+#define TX_OUTPUT_POWER                             14        // dBm
 
-/* USER CODE END PM */
+#if defined( USE_MODEM_LORA )
 
-/* Private variables ---------------------------------------------------------*/
-SPI_HandleTypeDef hspi1;
-SPI_HandleTypeDef hspi2;
-SPI_HandleTypeDef hspi4;
+#define LORA_BANDWIDTH                              0         // [0: 125 kHz,
+                                                              //  1: 250 kHz,
+                                                              //  2: 500 kHz,
+                                                              //  3: Reserved]
+#define LORA_SPREADING_FACTOR                       7         // [SF7..SF12]
+#define LORA_CODINGRATE                             1         // [1: 4/5,
+                                                              //  2: 4/6,
+                                                              //  3: 4/7,
+                                                              //  4: 4/8]
+#define LORA_PREAMBLE_LENGTH                        8         // Same for Tx and Rx
+#define LORA_SYMBOL_TIMEOUT                         5         // Symbols
+#define LORA_FIX_LENGTH_PAYLOAD_ON                  false
+#define LORA_IQ_INVERSION_ON                        false
 
-UART_HandleTypeDef huart2;
+#elif defined( USE_MODEM_FSK )
 
-/* USER CODE BEGIN PV */
+#define FSK_FDEV                                    25e3      // Hz
+#define FSK_DATARATE                                50e3      // bps
+#define FSK_BANDWIDTH                               50e3      // Hz
+#define FSK_AFC_BANDWIDTH                           83.333e3  // Hz
+#define FSK_PREAMBLE_LENGTH                         5         // Same for Tx and Rx
+#define FSK_FIX_LENGTH_PAYLOAD_ON                   false
 
-/* USER CODE END PV */
+#else
+    #error "Please define a modem in the compiler options."
+#endif
+
+typedef enum
+{
+    LOWPOWER,
+    RX,
+    RX_TIMEOUT,
+    RX_ERROR,
+    TX,
+    TX_TIMEOUT,
+}States_t;
+
+#define RX_TIMEOUT_VALUE                            1000
+#define BUFFER_SIZE                                 64 // Define the payload size here
+#define LED_PERIOD_MS               200
+
+#define LEDS_OFF   do{ \
+                   LED_Off( LED_BLUE ) ;   \
+                   LED_Off( LED_RED ) ;    \
+                   LED_Off( LED_GREEN1 ) ; \
+                   LED_Off( LED_GREEN2 ) ; \
+                   } while(0) ;
+
+const uint8_t PingMsg[] = "PING";
+const uint8_t PongMsg[] = "PONG";
+
+uint16_t BufferSize = BUFFER_SIZE;
+uint8_t Buffer[BUFFER_SIZE];
+
+States_t State = LOWPOWER;
+
+int8_t RssiValue = 0;
+int8_t SnrValue = 0;
+
+ /* Led Timers objects*/
+static  TimerEvent_t timerLed;
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
-static void MX_GPIO_Init(void);
-static void MX_SPI1_Init(void);
-static void MX_SPI2_Init(void);
-static void MX_SPI4_Init(void);
-static void MX_USART2_UART_Init(void);
-/* USER CODE BEGIN PFP */
+/*!
+ * Radio events function pointer
+ */
+static RadioEvents_t RadioEvents;
 
-/* USER CODE END PFP */
+/*!
+ * \brief Function to be executed on Radio Tx Done event
+ */
+void OnTxDone( void );
 
-/* Private user code ---------------------------------------------------------*/
-/* USER CODE BEGIN 0 */
+/*!
+ * \brief Function to be executed on Radio Rx Done event
+ */
+void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr );
 
-/* USER CODE END 0 */
+/*!
+ * \brief Function executed on Radio Tx Timeout event
+ */
+void OnTxTimeout( void );
+
+/*!
+ * \brief Function executed on Radio Rx Timeout event
+ */
+void OnRxTimeout( void );
+
+/*!
+ * \brief Function executed on Radio Rx Error event
+ */
+void OnRxError( void );
+
+/*!
+ * \brief Function executed on when led timer elapses
+ */
+static void OnledEvent( void );
+
+//#define BUFFERSIZE 6
+//#define RXBUFFSIZE 200
+
+/* Buffer used for reception */
+//uint8_t aRxBuffer[BUFFERSIZE];
+//char EpcBuf[RXBUFFSIZE];
+//
+//char ReadyBuf[5];
+//extern int ready;
+//extern uint8_t ReadyMsg[];
+//char buff[8];
+
+//extern SPI_HandleTypeDef hspi1;
+//extern SPI_HandleTypeDef hspi2;
 
 /**
-  * @brief  The application entry point.
-  * @retval int
-  */
-int main(void)
+ * Main application entry point.
+ */
+int main( void )
 {
-  /* USER CODE BEGIN 1 */
+  bool isMaster = true;
+  uint8_t i;
 
-  /* USER CODE END 1 */
-  
+  HAL_Init( );
 
-  /* MCU Configuration--------------------------------------------------------*/
+  SystemClock_Config( );
+//  SPI_Init(&hspi1);
+//  SPI_Init(&hspi2);
+//
+//  //SPI Lora
+//  SPI1_Init();
+//  //SPI Variscite
+//  SPI2_Init();
 
-  /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-  HAL_Init();
+//  DBG_Init( );
 
-  /* USER CODE BEGIN Init */
+  vcom_Init( );
 
-  /* USER CODE END Init */
+//  HW_Init( );
 
-  /* Configure the system clock */
-  SystemClock_Config();
+//   Radio initialization
+  RadioEvents.TxDone = OnTxDone;
+  RadioEvents.RxDone = OnRxDone;
+  RadioEvents.TxTimeout = OnTxTimeout;
+  RadioEvents.RxTimeout = OnRxTimeout;
+  RadioEvents.RxError = OnRxError;
 
-  /* USER CODE BEGIN SysInit */
+  Radio.Init( &RadioEvents );
 
-  /* USER CODE END SysInit */
+  Radio.SetChannel( RF_FREQUENCY );
 
-  /* Initialize all configured peripherals */
-  MX_GPIO_Init();
-  MX_SPI1_Init();
-  MX_SPI2_Init();
-  MX_SPI4_Init();
-  MX_USART2_UART_Init();
-  /* USER CODE BEGIN 2 */
 
-  /* USER CODE END 2 */
+#if defined( USE_MODEM_LORA )
 
-  /* Infinite loop */
-  /* USER CODE BEGIN WHILE */
-  while (1)
+  Radio.SetTxConfig( MODEM_LORA, TX_OUTPUT_POWER, 0, LORA_BANDWIDTH,
+                                 LORA_SPREADING_FACTOR, LORA_CODINGRATE,
+                                   LORA_PREAMBLE_LENGTH, LORA_FIX_LENGTH_PAYLOAD_ON,
+                                   true, 0, 0, LORA_IQ_INVERSION_ON, 3000000 );
+
+  Radio.SetRxConfig( MODEM_LORA, LORA_BANDWIDTH, LORA_SPREADING_FACTOR,
+                                   LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
+                                   LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
+                                   0, true, 0, 0, LORA_IQ_INVERSION_ON, true );
+
+#elif defined( USE_MODEM_FSK )
+
+  Radio.SetTxConfig( MODEM_FSK, TX_OUTPUT_POWER, FSK_FDEV, 0,
+                                  FSK_DATARATE, 0,
+                                  FSK_PREAMBLE_LENGTH, FSK_FIX_LENGTH_PAYLOAD_ON,
+                                  true, 0, 0, 0, 3000000 );
+
+  Radio.SetRxConfig( MODEM_FSK, FSK_BANDWIDTH, FSK_DATARATE,
+                                  0, FSK_AFC_BANDWIDTH, FSK_PREAMBLE_LENGTH,
+                                  0, FSK_FIX_LENGTH_PAYLOAD_ON, 0, true,
+                                  0, 0,false, true );
+
+#else
+    #error "Please define a frequency band in the compiler options."
+#endif
+
+  Radio.Rx( RX_TIMEOUT_VALUE );
+
+//  HAL_SPI_TransmitReceive(&hspi2, (uint8_t*)ReadyMsg, (uint8_t *)EpcBuf, 7, 5000);
+//  HAL_SPI_TransmitReceive(&hspi1, (uint8_t*)EpcBuf, (uint8_t *)ReadyBuf, 7, 5000);
+
+  while( 1 )
   {
-    /* USER CODE END WHILE */
+    switch( State )
+    {
+    case RX:
+      if( isMaster == true )
+      {
+        if( BufferSize > 0 )
+        {
+          if( strncmp( ( const char* )Buffer, ( const char* )PongMsg, 4 ) == 0 )
+          {
 
-    /* USER CODE BEGIN 3 */
+            // Send the next PING frame
+            Buffer[0] = 'P';
+            Buffer[1] = 'I';
+            Buffer[2] = 'N';
+            Buffer[3] = 'G';
+            // We fill the buffer with numbers for the payload
+            for( i = 4; i < BufferSize; i++ )
+            {
+              Buffer[i] = i - 4;
+            }
+            PRINTF("...PING\n");
+
+           // DelayMs( 1 );
+            Radio.Send( Buffer, BufferSize );
+            }
+            else if( strncmp( ( const char* )Buffer, ( const char* )PingMsg, 4 ) == 0 )
+            { // A master already exists then become a slave
+              isMaster = false;
+              //GpioWrite( &Led2, 1 ); // Set LED off
+              Radio.Rx( RX_TIMEOUT_VALUE );
+            }
+            else // valid reception but neither a PING or a PONG message
+            {    // Set device as master ans start again
+              isMaster = true;
+              Radio.Rx( RX_TIMEOUT_VALUE );
+            }
+          }
+        }
+        else
+        {
+          if( BufferSize > 0 )
+          {
+            if( strncmp( ( const char* )Buffer, ( const char* )PingMsg, 4 ) == 0 )
+            {
+              // Send the reply to the PONG string
+              Buffer[0] = 'P';
+              Buffer[1] = 'O';
+              Buffer[2] = 'N';
+              Buffer[3] = 'G';
+              // We fill the buffer with numbers for the payload
+              for( i = 4; i < BufferSize; i++ )
+              {
+                Buffer[i] = i - 4;
+              }
+            //  DelayMs( 1 );
+
+              Radio.Send( Buffer, BufferSize );
+              PRINTF("...PONG\n");
+            }
+            else // valid reception but not a PING as expected
+            {    // Set device as master and start again
+              isMaster = true;
+              Radio.Rx( RX_TIMEOUT_VALUE );
+            }
+         }
+      }
+      State = LOWPOWER;
+      break;
+    case TX:
+      // Indicates on a LED that we have sent a PING [Master]
+      // Indicates on a LED that we have sent a PONG [Slave]
+      //GpioWrite( &Led2, GpioRead( &Led2 ) ^ 1 );
+      Radio.Rx( RX_TIMEOUT_VALUE );
+      State = LOWPOWER;
+      break;
+    case RX_TIMEOUT:
+    case RX_ERROR:
+      if( isMaster == true )
+      {
+        // Send the next PING frame
+        Buffer[0] = 'P';
+        Buffer[1] = 'I';
+        Buffer[2] = 'N';
+        Buffer[3] = 'G';
+        for( i = 4; i < BufferSize; i++ )
+        {
+          Buffer[i] = i - 4;
+        }
+       // DelayMs( 1 );
+        Radio.Send( Buffer, BufferSize );
+      }
+      else
+      {
+        Radio.Rx( RX_TIMEOUT_VALUE );
+      }
+      State = LOWPOWER;
+      break;
+    case TX_TIMEOUT:
+      Radio.Rx( RX_TIMEOUT_VALUE );
+      State = LOWPOWER;
+      break;
+    case LOWPOWER:
+      default:
+            // Set low power
+      break;
+    }
+
+    DISABLE_IRQ( );
+    /* if an interupt has occured after __disable_irq, it is kept pending
+     * and cortex will not enter low power anyway  */
+    if (State == LOWPOWER)
+    {
+//#ifndef LOW_POWER_DISABLE
+//      LowPower_Handler( );
+//#endif
+    }
+    ENABLE_IRQ( );
+
   }
-  /* USER CODE END 3 */
 }
 
+
 /**
-  * @brief System Clock Configuration
-  * @retval None
-  */
-void SystemClock_Config(void)
+ * @brief  System Clock Configuration
+ *         The system Clock is configured as follow :
+ *            System Clock source            = PLL (HSI)
+ *            SYSCLK(Hz)                     = 84000000
+ *            HCLK(Hz)                       = 84000000
+ *            AHB Prescaler                  = 1
+ *            APB1 Prescaler                 = 2
+ *            APB2 Prescaler                 = 1
+ *            HSI Frequency(Hz)              = 16000000
+ *            PLL_M                          = 16
+ *            PLL_N                          = 336
+ *            PLL_P                          = 4
+ *            PLL_Q                          = 7
+ *            VDD(V)                         = 3.3
+ *            Main regulator output voltage  = Scale2 mode
+ *            Flash Latency(WS)              = 2
+ * @param  None
+ * @retval None
+ */
+void SystemClock_Config(void) {
+	RCC_ClkInitTypeDef RCC_ClkInitStruct;
+	RCC_OscInitTypeDef RCC_OscInitStruct;
+
+	/* Enable Power Control clock */
+	__HAL_RCC_PWR_CLK_ENABLE();
+
+	/* The voltage scaling allows optimizing the power consumption when the device is
+	 clocked below the maximum system frequency, to update the voltage scaling value
+	 regarding system frequency refer to product datasheet.  */
+	__HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE2);
+
+	/* Enable HSI Oscillator and activate PLL with HSI as source */
+	RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
+	RCC_OscInitStruct.HSIState = RCC_HSI_ON;
+	RCC_OscInitStruct.HSICalibrationValue = 0x10;
+	RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
+	RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSI;
+	RCC_OscInitStruct.PLL.PLLM = 16;
+	RCC_OscInitStruct.PLL.PLLN = 336;
+	RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV4;
+	RCC_OscInitStruct.PLL.PLLQ = 7;
+	if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
+		//Error_Handler();
+	}
+
+	/* Select PLL as system clock source and configure the HCLK, PCLK1 and PCLK2
+	 clocks dividers */
+	RCC_ClkInitStruct.ClockType = (RCC_CLOCKTYPE_SYSCLK | RCC_CLOCKTYPE_HCLK
+			| RCC_CLOCKTYPE_PCLK1 | RCC_CLOCKTYPE_PCLK2);
+	RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_PLLCLK;
+	RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
+	RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
+	RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
+	if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_2) != HAL_OK) {
+		//Error_Handler();
+	}
+}
+
+
+void OnTxDone( void )
 {
-  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-
-  /** Configure the main internal regulator output voltage 
-  */
-  __HAL_RCC_PWR_CLK_ENABLE();
-  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE1);
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /** Initializes the CPU, AHB and APB busses clocks 
-  */
-  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-
-  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-  {
-    Error_Handler();
-  }
+    Radio.Sleep( );
+    State = TX;
+    PRINTF("OnTxDone\n");
 }
 
-/**
-  * @brief SPI1 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI1_Init(void)
+void OnRxDone( uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr )
 {
+    Radio.Sleep( );
+    BufferSize = size;
+    memcpy( Buffer, payload, BufferSize );
+    RssiValue = rssi;
+    SnrValue = snr;
+    State = RX;
 
-  /* USER CODE BEGIN SPI1_Init 0 */
-
-  /* USER CODE END SPI1_Init 0 */
-
-  /* USER CODE BEGIN SPI1_Init 1 */
-
-  /* USER CODE END SPI1_Init 1 */
-  /* SPI1 parameter configuration*/
-  hspi1.Instance = SPI1;
-  hspi1.Init.Mode = SPI_MODE_MASTER;
-  hspi1.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi1.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi1.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi1.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi1.Init.NSS = SPI_NSS_HARD_INPUT;
-  hspi1.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi1.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi1.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi1.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi1.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi1) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI1_Init 2 */
-
-  /* USER CODE END SPI1_Init 2 */
-
+    PRINTF("OnRxDone\n");
+    PRINTF("RssiValue=%d dBm, SnrValue=%d\n", rssi, snr);
 }
 
-/**
-  * @brief SPI2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI2_Init(void)
+void OnTxTimeout( void )
 {
+    Radio.Sleep( );
+    State = TX_TIMEOUT;
 
-  /* USER CODE BEGIN SPI2_Init 0 */
-
-  /* USER CODE END SPI2_Init 0 */
-
-  /* USER CODE BEGIN SPI2_Init 1 */
-
-  /* USER CODE END SPI2_Init 1 */
-  /* SPI2 parameter configuration*/
-  hspi2.Instance = SPI2;
-  hspi2.Init.Mode = SPI_MODE_MASTER;
-  hspi2.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi2.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi2.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi2.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi2.Init.NSS = SPI_NSS_HARD_INPUT;
-  hspi2.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi2.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi2.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi2.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi2.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI2_Init 2 */
-
-  /* USER CODE END SPI2_Init 2 */
-
+    PRINTF("OnTxTimeout\n");
 }
 
-/**
-  * @brief SPI4 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_SPI4_Init(void)
+void OnRxTimeout( void )
 {
-
-  /* USER CODE BEGIN SPI4_Init 0 */
-
-  /* USER CODE END SPI4_Init 0 */
-
-  /* USER CODE BEGIN SPI4_Init 1 */
-
-  /* USER CODE END SPI4_Init 1 */
-  /* SPI4 parameter configuration*/
-  hspi4.Instance = SPI4;
-  hspi4.Init.Mode = SPI_MODE_MASTER;
-  hspi4.Init.Direction = SPI_DIRECTION_2LINES;
-  hspi4.Init.DataSize = SPI_DATASIZE_8BIT;
-  hspi4.Init.CLKPolarity = SPI_POLARITY_LOW;
-  hspi4.Init.CLKPhase = SPI_PHASE_1EDGE;
-  hspi4.Init.NSS = SPI_NSS_HARD_INPUT;
-  hspi4.Init.BaudRatePrescaler = SPI_BAUDRATEPRESCALER_2;
-  hspi4.Init.FirstBit = SPI_FIRSTBIT_MSB;
-  hspi4.Init.TIMode = SPI_TIMODE_DISABLE;
-  hspi4.Init.CRCCalculation = SPI_CRCCALCULATION_DISABLE;
-  hspi4.Init.CRCPolynomial = 10;
-  if (HAL_SPI_Init(&hspi4) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN SPI4_Init 2 */
-
-  /* USER CODE END SPI4_Init 2 */
-
+    Radio.Sleep( );
+    State = RX_TIMEOUT;
+    PRINTF("OnRxTimeout\n");
 }
 
-/**
-  * @brief USART2 Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_USART2_UART_Init(void)
+void OnRxError( void )
 {
-
-  /* USER CODE BEGIN USART2_Init 0 */
-
-  /* USER CODE END USART2_Init 0 */
-
-  /* USER CODE BEGIN USART2_Init 1 */
-
-  /* USER CODE END USART2_Init 1 */
-  huart2.Instance = USART2;
-  huart2.Init.BaudRate = 115200;
-  huart2.Init.WordLength = UART_WORDLENGTH_8B;
-  huart2.Init.StopBits = UART_STOPBITS_1;
-  huart2.Init.Parity = UART_PARITY_NONE;
-  huart2.Init.Mode = UART_MODE_TX_RX;
-  huart2.Init.HwFlowCtl = UART_HWCONTROL_RTS;
-  huart2.Init.OverSampling = UART_OVERSAMPLING_16;
-  if (HAL_UART_Init(&huart2) != HAL_OK)
-  {
-    Error_Handler();
-  }
-  /* USER CODE BEGIN USART2_Init 2 */
-
-  /* USER CODE END USART2_Init 2 */
-
+    Radio.Sleep( );
+    State = RX_ERROR;
+    PRINTF("OnRxError\n");
 }
 
-/**
-  * @brief GPIO Initialization Function
-  * @param None
-  * @retval None
-  */
-static void MX_GPIO_Init(void)
+static void OnledEvent( void )
 {
-
-  /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOE_CLK_ENABLE();
-  __HAL_RCC_GPIOA_CLK_ENABLE();
-  __HAL_RCC_GPIOB_CLK_ENABLE();
-
+  TimerStart(&timerLed );
 }
-
-/* USER CODE BEGIN 4 */
-
-/* USER CODE END 4 */
-
-/**
-  * @brief  This function is executed in case of error occurrence.
-  * @retval None
-  */
-void Error_Handler(void)
-{
-  /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-
-  /* USER CODE END Error_Handler_Debug */
-}
-
-#ifdef  USE_FULL_ASSERT
-/**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
-void assert_failed(uint8_t *file, uint32_t line)
-{ 
-  /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
-     tex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
-  /* USER CODE END 6 */
-}
-#endif /* USE_FULL_ASSERT */
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

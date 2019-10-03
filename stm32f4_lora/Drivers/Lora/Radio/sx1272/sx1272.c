@@ -1046,11 +1046,11 @@ void SX1272SetOpMode( uint8_t opMode )
 #endif
     if( opMode == RF_OPMODE_SLEEP )
     {
-        SX1272SetAntSwLowPower( true );
+//        SX1272SetAntSwLowPower( true );
     }
     else
     {
-        SX1272SetAntSwLowPower( false );
+//        SX1272SetAntSwLowPower( false );
         SX1272SetAntSw( opMode );
     }
     SX1272Write( REG_OPMODE, ( SX1272Read( REG_OPMODE ) & RF_OPMODE_MASK ) | opMode );
@@ -1110,34 +1110,34 @@ void SX1272WriteBuffer( uint16_t addr, uint8_t *buffer, uint8_t size )
     uint8_t i;
 
     //NSS = 0;
-    GpioWrite( &SX1272.Spi.Nss, 0 );
-
-    SpiInOut( &SX1272.Spi, addr | 0x80 );
-    for( i = 0; i < size; i++ )
-    {
-        SpiInOut( &SX1272.Spi, buffer[i] );
-    }
-
-    //NSS = 1;
-    GpioWrite( &SX1272.Spi.Nss, 1 );
+//    GpioWrite( &SX1272.Spi.Nss, 0 );
+//
+//    SpiInOut( &SX1272.Spi, addr | 0x80 );
+//    for( i = 0; i < size; i++ )
+//    {
+//        SpiInOut( &SX1272.Spi, buffer[i] );
+//    }
+//
+//    //NSS = 1;
+//    GpioWrite( &SX1272.Spi.Nss, 1 );
 }
 
 void SX1272ReadBuffer( uint16_t addr, uint8_t *buffer, uint8_t size )
 {
-    uint8_t i;
-
-    //NSS = 0;
-    GpioWrite( &SX1272.Spi.Nss, 0 );
-
-    SpiInOut( &SX1272.Spi, addr & 0x7F );
-
-    for( i = 0; i < size; i++ )
-    {
-        buffer[i] = SpiInOut( &SX1272.Spi, 0 );
-    }
-
-    //NSS = 1;
-    GpioWrite( &SX1272.Spi.Nss, 1 );
+//    uint8_t i;
+//
+//    //NSS = 0;
+//    GpioWrite( &SX1272.Spi.Nss, 0 );
+//
+//    SpiInOut( &SX1272.Spi, addr & 0x7F );
+//
+//    for( i = 0; i < size; i++ )
+//    {
+//        buffer[i] = SpiInOut( &SX1272.Spi, 0 );
+//    }
+//
+//    //NSS = 1;
+//    GpioWrite( &SX1272.Spi.Nss, 1 );
 }
 
 void SX1272WriteFifo( uint8_t *buffer, uint8_t size )
@@ -1184,10 +1184,10 @@ void SX1272SetPublicNetwork( bool enable )
     }
 }
 
-uint32_t SX1272GetWakeupTime( void )
-{
-    return SX1272GetBoardTcxoWakeupTime( ) + RADIO_WAKEUP_TIME;
-}
+//uint32_t SX1272GetWakeupTime( void )
+//{
+//    return SX1272GetBoardTcxoWakeupTime( ) + RADIO_WAKEUP_TIME;
+//}
 
 void SX1272OnTimeoutIrq( void )
 {

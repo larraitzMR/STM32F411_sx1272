@@ -64,7 +64,7 @@ Maintainer: Miguel Luis and Gregory Cristian
 
 void DelayMs( uint32_t ms )
 {
-  HW_RTC_DelayMs( ms );
+	HAL_Delay( ms );
 
 }
 

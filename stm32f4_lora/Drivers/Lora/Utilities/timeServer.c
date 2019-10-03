@@ -62,6 +62,7 @@ Maintainer: Miguel Luis, Gregory Cristian and Wael Guibene
 #include <time.h>
 //#include "hw.h"
 #include "timeServer.h"
+#include "utilities.h"
 //#include "low_power.h"
 
 
@@ -137,41 +138,41 @@ void TimerInit( TimerEvent_t *obj, void ( *callback )( void ) )
 
 void TimerStart( TimerEvent_t *obj )
 {
-  uint32_t elapsedTime = 0;
-  
-  BACKUP_PRIMASK();
-  
-  DISABLE_IRQ( );
-  
-
-  if( ( obj == NULL ) || ( TimerExists( obj ) == true ) )
-  {
-    RESTORE_PRIMASK( );
-    return;
-  }
-  obj->Timestamp = obj->ReloadValue;
-  obj->IsRunning = false;
-
-  if( TimerListHead == NULL )
-  {
-    HW_RTC_SetTimerContext( );
-    TimerInsertNewHeadTimer( obj ); // insert a timeout at now+obj->Timestamp
-  }
-  else 
-  {
-    elapsedTime = HW_RTC_GetTimerElapsedTime( );
-    obj->Timestamp += elapsedTime;
-  
-    if( obj->Timestamp < TimerListHead->Timestamp )
-    {
-      TimerInsertNewHeadTimer( obj);
-    }
-    else
-    {
-      TimerInsertTimer( obj);
-    }
-  }
-  RESTORE_PRIMASK( );
+//  uint32_t elapsedTime = 0;
+//
+//  BACKUP_PRIMASK();
+//
+//  DISABLE_IRQ( );
+//
+//
+//  if( ( obj == NULL ) || ( TimerExists( obj ) == true ) )
+//  {
+//    RESTORE_PRIMASK( );
+//    return;
+//  }
+//  obj->Timestamp = obj->ReloadValue;
+//  obj->IsRunning = false;
+//
+//  if( TimerListHead == NULL )
+//  {
+//    HW_RTC_SetTimerContext( );
+//    TimerInsertNewHeadTimer( obj ); // insert a timeout at now+obj->Timestamp
+//  }
+//  else
+//  {
+//    elapsedTime = HW_RTC_GetTimerElapsedTime( );
+//    obj->Timestamp += elapsedTime;
+//
+//    if( obj->Timestamp < TimerListHead->Timestamp )
+//    {
+//      TimerInsertNewHeadTimer( obj);
+//    }
+//    else
+//    {
+//      TimerInsertTimer( obj);
+//    }
+//  }
+//  RESTORE_PRIMASK( );
 }
 
 static void TimerInsertTimer( TimerEvent_t *obj)
@@ -267,75 +268,75 @@ void TimerIrqHandler( void )
 
 void TimerStop( TimerEvent_t *obj ) 
 {
-  BACKUP_PRIMASK();
-  
-  DISABLE_IRQ( );
-  
-  TimerEvent_t* prev = TimerListHead;
-  TimerEvent_t* cur = TimerListHead;
-
-  // List is empty or the Obj to stop does not exist 
-  if( ( TimerListHead == NULL ) || ( obj == NULL ) )
-  {
-    RESTORE_PRIMASK( );
-    return;
-  }
-
-  if( TimerListHead == obj ) // Stop the Head                  
-  {
-    if( TimerListHead->IsRunning == true ) // The head is already running 
-    {    
-      if( TimerListHead->Next != NULL )
-      {
-        TimerListHead->IsRunning = false;
-        TimerListHead = TimerListHead->Next;
-        TimerSetTimeout( TimerListHead );
-      }
-      else
-      {
-        HW_RTC_StopAlarm( );
-        TimerListHead = NULL;
-      }
-    }
-    else // Stop the head before it is started
-    {   
-      if( TimerListHead->Next != NULL )   
-      {
-        TimerListHead = TimerListHead->Next;
-      }
-      else
-      {
-        TimerListHead = NULL;
-      }
-    }
-  }
-  else // Stop an object within the list
-  {      
-    while( cur != NULL )
-    {
-      if( cur == obj )
-      {
-        if( cur->Next != NULL )
-        {
-          cur = cur->Next;
-          prev->Next = cur;
-        }
-        else
-        {
-          cur = NULL;
-          prev->Next = cur;
-        }
-        break;
-      }
-      else
-      {
-        prev = cur;
-        cur = cur->Next;
-      }
-    }   
-  }
-  
-  RESTORE_PRIMASK( );
+//  BACKUP_PRIMASK();
+//
+//  DISABLE_IRQ( );
+//
+//  TimerEvent_t* prev = TimerListHead;
+//  TimerEvent_t* cur = TimerListHead;
+//
+//  // List is empty or the Obj to stop does not exist
+//  if( ( TimerListHead == NULL ) || ( obj == NULL ) )
+//  {
+//    RESTORE_PRIMASK( );
+//    return;
+//  }
+//
+//  if( TimerListHead == obj ) // Stop the Head
+//  {
+//    if( TimerListHead->IsRunning == true ) // The head is already running
+//    {
+//      if( TimerListHead->Next != NULL )
+//      {
+//        TimerListHead->IsRunning = false;
+//        TimerListHead = TimerListHead->Next;
+//        TimerSetTimeout( TimerListHead );
+//      }
+//      else
+//      {
+//        HW_RTC_StopAlarm( );
+//        TimerListHead = NULL;
+//      }
+//    }
+//    else // Stop the head before it is started
+//    {
+//      if( TimerListHead->Next != NULL )
+//      {
+//        TimerListHead = TimerListHead->Next;
+//      }
+//      else
+//      {
+//        TimerListHead = NULL;
+//      }
+//    }
+//  }
+//  else // Stop an object within the list
+//  {
+//    while( cur != NULL )
+//    {
+//      if( cur == obj )
+//      {
+//        if( cur->Next != NULL )
+//        {
+//          cur = cur->Next;
+//          prev->Next = cur;
+//        }
+//        else
+//        {
+//          cur = NULL;
+//          prev->Next = cur;
+//        }
+//        break;
+//      }
+//      else
+//      {
+//        prev = cur;
+//        cur = cur->Next;
+//      }
+//    }
+//  }
+//
+//  RESTORE_PRIMASK( );
 }  
   
 static bool TimerExists( TimerEvent_t *obj )
@@ -361,46 +362,46 @@ void TimerReset( TimerEvent_t *obj )
 
 void TimerSetValue( TimerEvent_t *obj, uint32_t value )
 {
-  uint32_t minValue = 0;
-  uint32_t ticks = HW_RTC_ms2Tick( value );
-
-  TimerStop( obj );
-
-  minValue = HW_RTC_GetMinimumTimeout( );
-  
-  if( ticks < minValue )
-  {
-    ticks = minValue;
-  }
-
-  obj->Timestamp = ticks;
-  obj->ReloadValue = ticks;
+//  uint32_t minValue = 0;
+//  uint32_t ticks = HW_RTC_ms2Tick( value );
+//
+//  TimerStop( obj );
+//
+//  minValue = HW_RTC_GetMinimumTimeout( );
+//
+//  if( ticks < minValue )
+//  {
+//    ticks = minValue;
+//  }
+//
+//  obj->Timestamp = ticks;
+//  obj->ReloadValue = ticks;
 }
 
 TimerTime_t TimerGetCurrentTime( void )
 {
-  uint32_t now = HW_RTC_GetTimerValue( );
-  return  HW_RTC_Tick2ms(now);
+//  uint32_t now = HW_RTC_GetTimerValue( );
+//  return  HW_RTC_Tick2ms(now);
 }
 
 TimerTime_t TimerGetElapsedTime( TimerTime_t past )
 {
-  uint32_t nowInTicks = HW_RTC_GetTimerValue( );
-  uint32_t pastInTicks = HW_RTC_ms2Tick( past );
-  /* intentional wrap around. Works Ok if tick duation below 1ms */
-  return HW_RTC_Tick2ms( nowInTicks- pastInTicks );
+//  uint32_t nowInTicks = HW_RTC_GetTimerValue( );
+//  uint32_t pastInTicks = HW_RTC_ms2Tick( past );
+//  /* intentional wrap around. Works Ok if tick duation below 1ms */
+//  return HW_RTC_Tick2ms( nowInTicks- pastInTicks );
 }
 
 static void TimerSetTimeout( TimerEvent_t *obj )
 {
-  int32_t minTicks= HW_RTC_GetMinimumTimeout( );
-  obj->IsRunning = true; 
-
-  //in case deadline too soon
-  if(obj->Timestamp  < (HW_RTC_GetTimerElapsedTime(  ) + minTicks) )
-  {
-    obj->Timestamp = HW_RTC_GetTimerElapsedTime(  ) + minTicks;
-  }
-  HW_RTC_SetAlarm( obj->Timestamp );
+//  int32_t minTicks= HW_RTC_GetMinimumTimeout( );
+//  obj->IsRunning = true;
+//
+//  //in case deadline too soon
+//  if(obj->Timestamp  < (HW_RTC_GetTimerElapsedTime(  ) + minTicks) )
+//  {
+//    obj->Timestamp = HW_RTC_GetTimerElapsedTime(  ) + minTicks;
+//  }
+//  HW_RTC_SetAlarm( obj->Timestamp );
 }
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

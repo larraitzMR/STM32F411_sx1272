@@ -19,13 +19,12 @@ sx1272.c:1029:6:SX1272SetOpMode	16	static
 sx1272.c:1059:6:SX1272SetModem	16	static
 sx1272.c:1096:6:SX1272Write	16	static
 sx1272.c:1101:9:SX1272Read	24	static
-sx1272.c:1108:6:SX1272WriteBuffer	24	static
-sx1272.c:1125:6:SX1272ReadBuffer	24	static
+sx1272.c:1108:6:SX1272WriteBuffer	16	static
+sx1272.c:1125:6:SX1272ReadBuffer	16	static
 sx1272.c:1143:6:SX1272WriteFifo	16	static
 sx1272.c:1148:6:SX1272ReadFifo	16	static
 sx1272.c:1153:6:SX1272SetMaxPayloadLength	16	static
 sx1272.c:1171:6:SX1272SetPublicNetwork	16	static
-sx1272.c:1187:10:SX1272GetWakeupTime	8	static
 sx1272.c:1192:6:SX1272OnTimeoutIrq	16	static
 sx1272.c:1264:6:SX1272OnDio0Irq	24	static
 sx1272.c:1450:6:SX1272OnDio1Irq	8	static
